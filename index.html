@@ -9,23 +9,23 @@
 <body>
   <div id="game">
     <h1>어두운 중세 덱빌딩 RPG</h1>
-    <div>
-      <div class="label">적</div>
-      <div id="enemy-row" class="row"></div>
-    </div>
-    <div class="ally">
-      <div class="label">아군</div>
-      <div id="ally-row" class="row"></div>
-    </div>
+    <div id="enemy-row" class="row"></div>
+    <div class="vs"><span>VS</span></div>
+    <div id="ally-row" class="row ally"></div>
     <div class="bottom">
-      <div class="placeholder">손패 영역 (2단계)</div>
+      <div id="msg" class="msg"></div>
+      <div id="piles" class="piles"></div>
+      <div id="hand" class="hand"></div>
       <div class="bottom-row">
-        <div class="placeholder">에너지 (2단계)</div>
-        <div class="placeholder">턴 종료 (2단계)</div>
+        <div id="energy" class="energy"></div>
+        <button id="end-turn" class="end-turn">턴 종료</button>
       </div>
     </div>
   </div>
+  <script src="data/rules.js"></script>
+  <script src="data/cards.js"></script>
   <script src="data/battle_data.js"></script>
+  <script src="js/battle.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
