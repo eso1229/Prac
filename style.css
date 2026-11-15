@@ -39,7 +39,7 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .piles { font-size: 11px; color: #8a7a60; text-align: center; }
 .hand { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .card {
-  position: relative; min-height: 84px; padding: 16px 2px 4px; border-radius: 6px;
+  position: relative; min-height: 96px; padding: 16px 2px 4px; border-radius: 6px;
   background: #2a211b; border: 1px solid #6b5a42; color: #e8dcc8; font-size: 11px;
 }
 .card.attack { border-color: #a63a32; }
@@ -60,3 +60,7 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
   flex: 1; border-radius: 6px; border: 1px solid #6b5a42; background: #3a2a28;
   color: #e8dcc8; font-size: 14px;
 }
+.cowner { font-size: 10px; color: #b89b6a; margin-bottom: 2px; }
+.slot.move-from { outline: 2px solid #6fa3c7; }
+.end-turn:disabled { opacity: 0.4; }
+.end-turn.active { outline: 2px solid #d9b45a; }
