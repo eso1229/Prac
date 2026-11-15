@@ -1,0 +1,32 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #14110f; color: #e8dcc8;
+  font-family: sans-serif; font-size: 14px;
+}
+#game {
+  max-width: 480px; margin: 0 auto; min-height: 100vh;
+  display: flex; flex-direction: column; padding: 8px; gap: 8px;
+}
+h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
+.label { font-size: 12px; color: #8a7a60; margin: 2px 0; }
+.row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.slot {
+  background: #231d18; border: 1px solid #4a3d30; border-radius: 6px;
+  padding: 6px 4px; text-align: center; min-height: 96px;
+  overflow-wrap: anywhere;
+}
+.slot.hidden { visibility: hidden; }
+.pos { font-size: 11px; color: #8a7a60; }
+.name { font-weight: bold; margin: 2px 0 4px; font-size: 13px; }
+.bar { height: 6px; background: #3a2a28; border-radius: 3px; overflow: hidden; }
+.fill { height: 100%; background: #a63a32; }
+.stat { font-size: 11px; margin-top: 3px; }
+.block { color: #6fa3c7; }
+.ally .slot { border-color: #3d5a45; }
+.placeholder {
+  border: 1px dashed #4a3d30; border-radius: 6px; color: #6b5d4a;
+  text-align: center; padding: 14px 4px; font-size: 12px;
+}
+.bottom { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.bottom-row { display: flex; gap: 6px; }
+.bottom-row .placeholder { flex: 1; }
