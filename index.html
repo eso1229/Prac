@@ -4,12 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>어두운 중세 덱빌딩 RPG</title>
-  <style>
-    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-           background: #14110f; color: #e8dcc8; font-family: sans-serif; text-align: center; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>어두운 중세 덱빌딩 RPG</h1>
+  <div id="game">
+    <h1>어두운 중세 덱빌딩 RPG</h1>
+    <div>
+      <div class="label">적</div>
+      <div id="enemy-row" class="row"></div>
+    </div>
+    <div class="ally">
+      <div class="label">아군</div>
+      <div id="ally-row" class="row"></div>
+    </div>
+    <div class="bottom">
+      <div class="placeholder">손패 영역 (2단계)</div>
+      <div class="bottom-row">
+        <div class="placeholder">에너지 (2단계)</div>
+        <div class="placeholder">턴 종료 (2단계)</div>
+      </div>
+    </div>
+  </div>
+  <script src="data/battle_data.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
