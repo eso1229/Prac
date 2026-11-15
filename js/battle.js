@@ -79,10 +79,80 @@ function initBattle() {
   startTurn();
 }
 
-function endTurn() {
+// 아군 턴 종료: 남은 손패를 버린다
+function endPlayerTurn() {
   battle.discard = battle.discard.concat(battle.hand);
   battle.hand = [];
-  startTurn(); // 적 턴은 4단계에서 추가
+}
+
+// ---- 적 ----
+function currentIntent(e) {
+  return e.pattern[e.step % e.pattern.length];
+}
+
+function intentText(e) {
+  const a = currentIntent(e);
+  if (a.type === "attack") return "⚔ " + a.name + " " + a.value;
+  if (a.type === "block") return "🛡 " + a.name + " " + a.value;
+  return "🌀 " + a.name;
+}
+
+function livingAllies() {
+  return ALLIES.filter(function (a) { return a.hp > 0; });
+}
+
+// 칸 번호에 따른 확률로 아군 한 명을 고른다 (쓰러진 아군은 제외하고 비율을 다시 맞춘다)
+function pickTarget() {
+  const list = livingAllies();
+  if (list.length === 0) return null;
+  let total = 0;
+  list.forEach(function (a) { total += RULES.hitWeights[a.pos]; });
+  let r = Math.random() * total;
+  for (let i = 0; i < list.length; i++) {
+    r -= RULES.hitWeights[list[i].pos];
+    if (r < 0) return list[i];
+  }
+  return list[list.length - 1];
+}
+
+function swapPos(a, b) {
+  const t = a.pos;
+  a.pos = b.pos;
+  b.pos = t;
+}
+
+// 적 턴이 시작될 때: 적의 방어도가 사라진다
+function startEnemyTurn() {
+  ENEMIES.forEach(function (e) { e.block = 0; });
+}
+
+// 이번 적 턴에 행동할 적 (1번 칸부터)
+function actingEnemies() {
+  return ENEMIES.filter(function (e) { return e.hp > 0; })
+    .sort(function (a, b) { return a.pos - b.pos; });
+}
+
+// 적 한 명이 행동하고, 기록 문장을 돌려준다
+function enemyAct(e) {
+  const a = currentIntent(e);
+  e.step++;
+  if (a.type === "attack") {
+    const t = pickTarget();
+    if (!t) return e.name + ": " + a.name + " (대상 없음)";
+    applyDamage(t, a.value);
+    return e.name + " → " + t.name + " " + a.name + " (피해 " + a.value + ")";
+  }
+  if (a.type === "block") {
+    e.block += a.value;
+    return e.name + ": " + a.name + " (방어도 " + a.value + ")";
+  }
+  if (a.type === "curse") {
+    const list = shuffle(livingAllies().slice());
+    if (list.length < 2) return e.name + ": " + a.name + " (효과 없음)";
+    swapPos(list[0], list[1]);
+    return e.name + ": " + a.name + " - " + list[0].name + " ↔ " + list[1].name + " 자리 교환";
+  }
+  return "";
 }
 
 function applyDamage(unit, value) {
@@ -121,9 +191,7 @@ function canMove() {
 
 function swapAllies(a, b) {
   if (!canMove() || Math.abs(a.pos - b.pos) !== 1) return false;
-  const t = a.pos;
-  a.pos = b.pos;
-  b.pos = t;
+  swapPos(a, b);
   battle.energy -= RULES.moveCost;
   battle.moves++;
   return true;

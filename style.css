@@ -64,3 +64,5 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .slot.move-from { outline: 2px solid #6fa3c7; }
 .end-turn:disabled { opacity: 0.4; }
 .end-turn.active { outline: 2px solid #d9b45a; }
+.intent { font-size: 11px; color: #e0b050; margin: 1px 0 2px; }
+.log { font-size: 11px; color: #a89a80; min-height: 42px; text-align: center; line-height: 1.35; }

@@ -5,6 +5,8 @@ let selected = null;   // 선택한 손패 번호
 let moveMode = false;  // 직접 이동 중인지
 let moveFrom = null;   // 이동할 아군 (첫 번째로 고른 아군)
 let notice = "";       // 안내 문구 (못 쓰는 이유 등)
+let busy = false;      // 적 턴 진행 중이면 입력을 막는다
+const logLines = [];   // 전투 기록
 
 function cancelAll() {
   selected = null;
@@ -15,6 +17,7 @@ function cancelAll() {
 
 // 지금 이 유닛을 누를 수 있는가? 누르면 실행할 함수를 돌려준다
 function slotAction(unit, kind) {
+  if (busy) return null;
   if (selected !== null) {
     const c = battle.hand[selected];
     if (validTargets(c).indexOf(unit) >= 0) {
@@ -49,6 +52,7 @@ function makeSlot(unit, pos, kind) {
   const pct = Math.max(0, Math.round((unit.hp / unit.maxHp) * 100));
   slot.innerHTML =
     num +
+    (kind === "enemy" && unit.hp > 0 ? '<div class="intent">' + intentText(unit) + "</div>" : "") +
     '<div class="name">' + unit.name + "</div>" +
     '<div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
     '<div class="stat">체력 ' + unit.hp + "/" + unit.maxHp + "</div>" +
@@ -90,6 +94,7 @@ function renderHand() {
       '<div class="cname">' + card.name + "</div>" +
       '<div class="ctext">' + cardText(card) + "</div>";
     el.onclick = function () {
+      if (busy) return;
       if (reason) { // 못 쓰는 카드는 이유만 보여준다
         cancelAll();
         notice = reason;
@@ -115,11 +120,15 @@ function render() {
     "덱 " + battle.deck.length + " · 버림 " + battle.discard.length + " · 턴 " + battle.turn;
   const moveBtn = document.getElementById("move");
   moveBtn.textContent = "이동 (" + RULES.moveCost + ")";
-  moveBtn.disabled = !canMove();
+  moveBtn.disabled = busy || !canMove();
+  document.getElementById("end-turn").disabled = busy;
+  document.getElementById("log").innerHTML = logLines.slice(-3).join("<br>");
   moveBtn.classList.toggle("active", moveMode);
 
   const msg = document.getElementById("msg");
-  if (notice) {
+  if (busy) {
+    msg.textContent = "적의 턴...";
+  } else if (notice) {
     msg.textContent = notice;
   } else if (selected !== null) {
     const c = battle.hand[selected];
@@ -135,13 +144,37 @@ function render() {
   }
 }
 
-document.getElementById("end-turn").onclick = function () {
-  cancelAll();
-  endTurn();
+// 적 턴: 1번 칸 적부터 한 명씩 행동하고, 끝나면 아군 턴을 시작한다
+function runEnemyTurn() {
+  busy = true;
+  startEnemyTurn();
+  const queue = actingEnemies();
   render();
+  function next() {
+    if (queue.length === 0) {
+      startTurn();
+      busy = false;
+      logLines.push("--- 턴 " + battle.turn + " ---");
+      render();
+      return;
+    }
+    const e = queue.shift();
+    if (e.hp > 0) logLines.push(enemyAct(e));
+    render();
+    setTimeout(next, RULES.enemyActionDelay);
+  }
+  setTimeout(next, RULES.enemyActionDelay);
+}
+
+document.getElementById("end-turn").onclick = function () {
+  if (busy) return;
+  cancelAll();
+  endPlayerTurn();
+  runEnemyTurn();
 };
 
 document.getElementById("move").onclick = function () {
+  if (busy) return;
   const wasOn = moveMode;
   cancelAll();
   moveMode = !wasOn && canMove();

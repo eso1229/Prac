@@ -7,8 +7,9 @@ const ALLIES = [
   { name: "세라", pos: 4, hp: 30, maxHp: 30, block: 0 },
 ];
 
+// 적은 data/enemies.js의 종류와 칸 번호로 만든다
 const ENEMIES = [
-  { name: "해골 병사", pos: 1, hp: 18, maxHp: 18, block: 0 },
-  { name: "광신도", pos: 2, hp: 14, maxHp: 14, block: 0 },
-  { name: "해골 궁수", pos: 3, hp: 12, maxHp: 12, block: 0 },
+  spawnEnemy("skeletonSoldier", 1),
+  spawnEnemy("cultist", 2),
+  spawnEnemy("skeletonArcher", 3),
 ];
