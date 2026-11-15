@@ -1,10 +1,39 @@
 // 화면 그리기와 입력 처리
 // 칸 방향: 적은 왼쪽이 1번, 아군은 오른쪽이 1번 (서로 마주봄)
 const SLOT_COUNT = 4;
-let selected = null; // 선택한 손패 번호
+let selected = null;   // 선택한 손패 번호
+let moveMode = false;  // 직접 이동 중인지
+let moveFrom = null;   // 이동할 아군 (첫 번째로 고른 아군)
+let notice = "";       // 안내 문구 (못 쓰는 이유 등)
 
-function targetKind() {
-  return selected === null ? null : CARDS[battle.hand[selected]].target;
+function cancelAll() {
+  selected = null;
+  moveMode = false;
+  moveFrom = null;
+  notice = "";
+}
+
+// 지금 이 유닛을 누를 수 있는가? 누르면 실행할 함수를 돌려준다
+function slotAction(unit, kind) {
+  if (selected !== null) {
+    const c = battle.hand[selected];
+    if (validTargets(c).indexOf(unit) >= 0) {
+      return function () { playCard(selected, unit); cancelAll(); };
+    }
+    return null;
+  }
+  if (moveMode && kind === "ally") {
+    if (moveFrom === null) {
+      return function () { moveFrom = unit; };
+    }
+    if (unit === moveFrom) {
+      return function () { moveFrom = null; };
+    }
+    if (Math.abs(unit.pos - moveFrom.pos) === 1) {
+      return function () { swapAllies(moveFrom, unit); cancelAll(); };
+    }
+  }
+  return null;
 }
 
 function makeSlot(unit, pos, kind) {
@@ -24,13 +53,11 @@ function makeSlot(unit, pos, kind) {
     '<div class="bar"><div class="fill" style="width:' + pct + '%"></div></div>' +
     '<div class="stat">체력 ' + unit.hp + "/" + unit.maxHp + "</div>" +
     '<div class="stat block">방어 ' + unit.block + "</div>";
-  if (targetKind() === kind) {
+  if (unit === moveFrom) slot.classList.add("move-from");
+  const action = slotAction(unit, kind);
+  if (action) {
     slot.classList.add("targetable");
-    slot.onclick = function () {
-      playCard(selected, unit);
-      selected = null;
-      render();
-    };
+    slot.onclick = function () { action(); render(); };
   }
   return slot;
 }
@@ -50,19 +77,28 @@ function renderRow(rowId, units, kind, reverse) {
 function renderHand() {
   const hand = document.getElementById("hand");
   hand.innerHTML = "";
-  battle.hand.forEach(function (id, i) {
-    const card = CARDS[id];
+  battle.hand.forEach(function (c, i) {
+    const card = CARDS[c.id];
+    const reason = cannotPlayReason(c);
     const el = document.createElement("button");
     el.className = "card " + card.type;
-    if (!canPlay(id)) el.classList.add("disabled");
+    if (reason) el.classList.add("disabled");
     if (i === selected) el.classList.add("selected");
     el.innerHTML =
       '<div class="cost">' + card.cost + "</div>" +
+      '<div class="cowner">' + c.owner + " " + rangeText(card.usePos) + "칸</div>" +
       '<div class="cname">' + card.name + "</div>" +
       '<div class="ctext">' + cardText(card) + "</div>";
     el.onclick = function () {
-      if (!canPlay(id)) return;
-      selected = selected === i ? null : i; // 한 번 더 누르면 취소
+      if (reason) { // 못 쓰는 카드는 이유만 보여준다
+        cancelAll();
+        notice = reason;
+      } else if (i === selected) {
+        cancelAll(); // 한 번 더 누르면 취소
+      } else {
+        cancelAll();
+        selected = i;
+      }
       render();
     };
     hand.appendChild(el);
@@ -77,19 +113,38 @@ function render() {
     "에너지 " + battle.energy + "/" + RULES.energyMax;
   document.getElementById("piles").textContent =
     "덱 " + battle.deck.length + " · 버림 " + battle.discard.length + " · 턴 " + battle.turn;
+  const moveBtn = document.getElementById("move");
+  moveBtn.textContent = "이동 (" + RULES.moveCost + ")";
+  moveBtn.disabled = !canMove();
+  moveBtn.classList.toggle("active", moveMode);
+
   const msg = document.getElementById("msg");
-  if (selected === null) {
-    msg.textContent = "카드를 눌러 선택하세요";
+  if (notice) {
+    msg.textContent = notice;
+  } else if (selected !== null) {
+    const c = battle.hand[selected];
+    const card = CARDS[c.id];
+    const who = card.target === "self" ? "빛나는 " + c.owner + " 칸을 누르세요" : "대상 적을 누르세요";
+    msg.textContent = card.name + " (" + cardText(card) + ") - " + who;
+  } else if (moveMode) {
+    msg.textContent = moveFrom === null
+      ? "자리를 바꿀 아군을 누르세요"
+      : "(" + moveFrom.name + ") 바꿀 옆 칸 아군을 누르세요";
   } else {
-    const c = CARDS[battle.hand[selected]];
-    msg.textContent = c.name + " (" + cardText(c) + ") - " +
-      (c.target === "enemy" ? "대상 적을 누르세요" : "대상 아군을 누르세요");
+    msg.textContent = "카드를 눌러 선택하세요";
   }
 }
 
 document.getElementById("end-turn").onclick = function () {
-  selected = null;
+  cancelAll();
   endTurn();
+  render();
+};
+
+document.getElementById("move").onclick = function () {
+  const wasOn = moveMode;
+  cancelAll();
+  moveMode = !wasOn && canMove();
   render();
 };
 
