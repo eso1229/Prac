@@ -6,8 +6,8 @@
 **현재 진행 단계: 0단계**
 
 ## 0단계: 저장소 준비
-- [ ] CLAUDE.md, GAME_DESIGN.md, PLAN.md가 저장소에 있다
-- [ ] 빈 게임 페이지(`index.html`)가 하나 있고 GitHub Pages 주소에서 열린다
+- [x] CLAUDE.md, GAME_DESIGN.md, PLAN.md가 저장소에 있다
+- [x] 빈 게임 페이지(`index.html`)가 하나 있고 GitHub Pages 주소에서 열린다
 - 완료 조건: 폰 브라우저에서 Pages 주소를 열면 제목이 보인다
 
 ## 1단계: 전투 화면 뼈대 (움직임 없음)
@@ -70,3 +70,4 @@
 
 ## 진행 기록
 - (작업이 끝날 때마다 날짜와 한 줄 요약을 추가)
+- 2026-11-15: 0단계 - 문서 3종과 빈 `index.html` 추가 (Pages 켜기는 사용자 확인 필요)
