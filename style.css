@@ -23,10 +23,40 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .stat { font-size: 11px; margin-top: 3px; }
 .block { color: #6fa3c7; }
 .ally .slot { border-color: #3d5a45; }
-.placeholder {
-  border: 1px dashed #4a3d30; border-radius: 6px; color: #6b5d4a;
-  text-align: center; padding: 14px 4px; font-size: 12px;
-}
+.row { align-items: start; }
+/* 대치 연출: 1번 칸이 가운데(VS 선)에 가장 가깝다 */
+#enemy-row .slot[data-pos="1"] { margin-top: 24px; }
+#enemy-row .slot[data-pos="2"] { margin-top: 16px; }
+#enemy-row .slot[data-pos="3"] { margin-top: 8px; }
+#ally-row .slot[data-pos="2"] { margin-top: 8px; }
+#ally-row .slot[data-pos="3"] { margin-top: 16px; }
+#ally-row .slot[data-pos="4"] { margin-top: 24px; }
+.vs { display: flex; align-items: center; gap: 8px; color: #8a7a60; font-size: 12px; }
+.vs::before, .vs::after { content: ""; flex: 1; border-top: 1px solid #4a3d30; }
+.slot.targetable { outline: 2px solid #d9b45a; cursor: pointer; }
 .bottom { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.msg { font-size: 12px; color: #d9b45a; min-height: 16px; text-align: center; }
+.piles { font-size: 11px; color: #8a7a60; text-align: center; }
+.hand { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.card {
+  position: relative; min-height: 84px; padding: 16px 2px 4px; border-radius: 6px;
+  background: #2a211b; border: 1px solid #6b5a42; color: #e8dcc8; font-size: 11px;
+}
+.card.attack { border-color: #a63a32; }
+.card.block { border-color: #4f7fa3; }
+.card.selected { outline: 2px solid #d9b45a; transform: translateY(-4px); }
+.card.disabled { opacity: 0.4; }
+.cost {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; line-height: 16px;
+  border-radius: 50%; background: #d9b45a; color: #14110f; font-weight: bold; font-size: 11px;
+}
+.cname { font-weight: bold; margin-bottom: 4px; }
 .bottom-row { display: flex; gap: 6px; }
-.bottom-row .placeholder { flex: 1; }
+.energy {
+  flex: 1; text-align: center; padding: 12px 4px; border-radius: 6px;
+  background: #231d18; border: 1px solid #4a3d30; color: #d9b45a;
+}
+.end-turn {
+  flex: 1; border-radius: 6px; border: 1px solid #6b5a42; background: #3a2a28;
+  color: #e8dcc8; font-size: 14px;
+}
