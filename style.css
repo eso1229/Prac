@@ -66,3 +66,22 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .end-turn.active { outline: 2px solid #d9b45a; }
 .intent { font-size: 11px; color: #e0b050; margin: 1px 0 2px; }
 .log { font-size: 11px; color: #a89a80; min-height: 42px; text-align: center; line-height: 1.35; }
+[hidden] { display: none !important; }
+h1 .mini { font-size: 10px; margin-left: 4px; background: #3a2a28; color: #b89b6a; border: 1px solid #6b5a42; border-radius: 4px; padding: 2px 4px; }
+.screen { max-width: 480px; margin: 0 auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.screen h2 { font-size: 16px; text-align: center; color: #b89b6a; margin: 4px 0; }
+.screen h3 { font-size: 13px; color: #8a7a60; margin: 6px 0 0; }
+.cchar { background: #231d18; border: 1px solid #3d5a45; border-radius: 6px; padding: 6px; }
+.cchar-name { font-weight: bold; margin-bottom: 4px; }
+.cchar-name small { font-weight: normal; color: #8a7a60; margin-left: 6px; }
+.cslots { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cslot, .cstock {
+  background: #2a211b; border: 1px solid #6b5a42; border-radius: 6px; color: #e8dcc8;
+  font-size: 12px; padding: 6px; text-align: left; min-height: 44px;
+}
+.cslot small, .cstock small { display: block; color: #a89a80; font-size: 10px; margin-top: 2px; }
+.cslot.empty { border-style: dashed; color: #6b5d4a; text-align: center; line-height: 32px; padding: 0; }
+.cstock.selected { outline: 2px solid #d9b45a; }
+.cempty, .cdeck, .cnotice { font-size: 12px; text-align: center; color: #8a7a60; }
+.cnotice { color: #d9b45a; min-height: 16px; }
+.cstart { padding: 14px; margin-top: 4px; }
