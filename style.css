@@ -4,42 +4,42 @@ body {
   font-family: sans-serif; font-size: 14px;
 }
 #game {
-  max-width: 480px; margin: 0 auto; min-height: 100vh;
-  display: flex; flex-direction: column; padding: 8px; gap: 8px;
+  max-width: 480px; margin: 0 auto; min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; padding: 6px 8px; gap: 5px;
 }
 h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .label { font-size: 12px; color: #8a7a60; margin: 2px 0; }
 .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .slot {
   background: #231d18; border: 1px solid #4a3d30; border-radius: 6px;
-  padding: 6px 4px; text-align: center; min-height: 96px;
+  padding: 4px 4px; text-align: center; min-height: 84px;
   overflow-wrap: anywhere;
 }
 .slot.hidden { visibility: hidden; }
 .pos { font-size: 11px; color: #8a7a60; }
-.name { font-weight: bold; margin: 2px 0 4px; font-size: 13px; }
+.name { font-weight: bold; margin: 1px 0 3px; font-size: 13px; }
 .bar { height: 6px; background: #3a2a28; border-radius: 3px; overflow: hidden; }
 .fill { height: 100%; background: #a63a32; }
-.stat { font-size: 11px; margin-top: 3px; }
+.stat { font-size: 11px; margin-top: 2px; }
 .block { color: #6fa3c7; }
 .ally .slot { border-color: #3d5a45; }
 .row { align-items: start; }
 /* 대치 연출: 1번 칸이 가운데(VS 선)에 가장 가깝다 */
-#enemy-row .slot[data-pos="1"] { margin-top: 24px; }
-#enemy-row .slot[data-pos="2"] { margin-top: 16px; }
-#enemy-row .slot[data-pos="3"] { margin-top: 8px; }
-#ally-row .slot[data-pos="2"] { margin-top: 8px; }
-#ally-row .slot[data-pos="3"] { margin-top: 16px; }
-#ally-row .slot[data-pos="4"] { margin-top: 24px; }
+#enemy-row .slot[data-pos="1"] { margin-top: 18px; }
+#enemy-row .slot[data-pos="2"] { margin-top: 12px; }
+#enemy-row .slot[data-pos="3"] { margin-top: 6px; }
+#ally-row .slot[data-pos="2"] { margin-top: 6px; }
+#ally-row .slot[data-pos="3"] { margin-top: 12px; }
+#ally-row .slot[data-pos="4"] { margin-top: 18px; }
 .vs { display: flex; align-items: center; gap: 8px; color: #8a7a60; font-size: 12px; }
 .vs::before, .vs::after { content: ""; flex: 1; border-top: 1px solid #4a3d30; }
 .slot.targetable { outline: 2px solid #d9b45a; cursor: pointer; }
-.bottom { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.bottom { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
 .msg { font-size: 12px; color: #d9b45a; min-height: 16px; text-align: center; }
 .piles { font-size: 11px; color: #8a7a60; text-align: center; }
 .hand { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
 .card {
-  position: relative; min-height: 96px; padding: 16px 2px 4px; border-radius: 6px;
+  position: relative; min-height: 88px; padding: 14px 2px 3px; border-radius: 6px;
   background: #2a211b; border: 1px solid #6b5a42; color: #e8dcc8; font-size: 11px;
 }
 .card.attack { border-color: #a63a32; }
@@ -53,7 +53,7 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .cname { font-weight: bold; margin-bottom: 4px; }
 .bottom-row { display: flex; gap: 6px; }
 .energy {
-  flex: 1; text-align: center; padding: 12px 4px; border-radius: 6px;
+  flex: 1; text-align: center; padding: 9px 4px; border-radius: 6px;
   background: #231d18; border: 1px solid #4a3d30; color: #d9b45a;
 }
 .end-turn {
@@ -65,23 +65,32 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .end-turn:disabled { opacity: 0.4; }
 .end-turn.active { outline: 2px solid #d9b45a; }
 .intent { font-size: 11px; color: #e0b050; margin: 1px 0 2px; }
-.log { font-size: 11px; color: #a89a80; min-height: 42px; text-align: center; line-height: 1.35; }
+.log { font-size: 11px; color: #a89a80; min-height: 30px; text-align: center; line-height: 1.35; }
 [hidden] { display: none !important; }
 h1 .mini { font-size: 10px; margin-left: 4px; background: #3a2a28; color: #b89b6a; border: 1px solid #6b5a42; border-radius: 4px; padding: 2px 4px; }
-.screen { max-width: 480px; margin: 0 auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.screen { max-width: 480px; margin: 0 auto; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px; }
 .screen h2 { font-size: 16px; text-align: center; color: #b89b6a; margin: 4px 0; }
 .screen h3 { font-size: 13px; color: #8a7a60; margin: 6px 0 0; }
-.cchar { background: #231d18; border: 1px solid #3d5a45; border-radius: 6px; padding: 6px; }
+.cchar { background: #231d18; border: 1px solid #3d5a45; border-radius: 6px; padding: 5px 6px; }
 .cchar-name { font-weight: bold; margin-bottom: 4px; }
 .cchar-name small { font-weight: normal; color: #8a7a60; margin-left: 6px; }
 .cslots { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .cslot, .cstock {
   background: #2a211b; border: 1px solid #6b5a42; border-radius: 6px; color: #e8dcc8;
-  font-size: 12px; padding: 6px; text-align: left; min-height: 44px;
+  font-size: 12px; padding: 4px 6px; text-align: left; min-height: 40px;
 }
 .cslot small, .cstock small { display: block; color: #a89a80; font-size: 10px; margin-top: 2px; }
-.cslot.empty { border-style: dashed; color: #6b5d4a; text-align: center; line-height: 32px; padding: 0; }
+.cslot.empty { border-style: dashed; color: #6b5d4a; text-align: center; line-height: 30px; padding: 0; }
 .cstock.selected { outline: 2px solid #d9b45a; }
 .cempty, .cdeck, .cnotice { font-size: 12px; text-align: center; color: #8a7a60; }
 .cnotice { color: #d9b45a; min-height: 16px; }
-.cstart { padding: 14px; margin-top: 4px; }
+.cstart { padding: 12px; margin-top: 2px; }
+.popup-back { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.popup { position: relative; width: 100%; max-width: 360px; background: #231d18; border: 1px solid #b89b6a; border-radius: 8px; padding: 14px 12px 12px; }
+.popup h3 { margin: 0 24px 4px 0; font-size: 16px; color: #d9b45a; }
+.popup .ptrait { font-size: 12px; color: #6fa3c7; margin-bottom: 8px; }
+.popup .pcards { font-size: 12px; color: #e8dcc8; margin: 0 0 10px; padding-left: 16px; }
+.popup .pcards li { margin-bottom: 4px; }
+.popup .pcards small { display: block; color: #a89a80; }
+.popup .pclose { position: absolute; top: 6px; right: 8px; width: 28px; height: 28px; border: none; background: none; color: #e8dcc8; font-size: 20px; }
+.popup .punequip { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #a63a32; background: #3a2a28; color: #e8dcc8; font-size: 14px; }

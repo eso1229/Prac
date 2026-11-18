@@ -52,9 +52,9 @@ function renderCamp() {
         ? ESSENCES[eid].name + "<small>" + ESSENCES[eid].text + "</small>"
         : "비어 있음";
       b.onclick = function () {
-        if (eid) { // 장착 중인 정수를 누르면 해제
-          a.essences.splice(i, 1);
-          campNotice = ESSENCES[eid].name + " 해제";
+        if (eid) { // 장착 중인 정수를 누르면 상세 팝업 (해제는 팝업의 버튼으로)
+          openEssencePopup(a, i);
+          return;
         } else if (campSelected !== null) {
           const id = freeEssences()[campSelected];
           a.essences.push(id);
@@ -88,8 +88,48 @@ function renderCamp() {
     return a.name + " " + deck.filter(function (c) { return c.owner === a.name; }).length;
   }).join(" · ");
   add("div", "cdeck", "덱 " + deck.length + "장 (" + counts + ")");
-  add("div", "cnotice", campNotice || "장착한 정수는 해제하려면 눌러요");
+  add("div", "cnotice", campNotice || "장착한 정수를 누르면 상세 내용을 볼 수 있어요");
   const start = add("button", "end-turn cstart", deck.length === 0 ? "정수를 장착하세요" : "전투 시작");
   start.disabled = deck.length === 0;
   start.onclick = startBattle;
+}
+
+// 카드 한 줄 설명 (비용, 사용 칸, 효과)
+function cardDetail(id) {
+  const c = CARDS[id];
+  let t = "비용 " + c.cost + " · " + rangeText(c.usePos) + "칸에서 사용 · " + cardText(c);
+  if (c.hitPos) t += " · 적 " + rangeText(c.hitPos) + "칸";
+  return t;
+}
+
+// 장착 중인 정수의 상세 팝업
+function closePopup() {
+  document.getElementById("popup").hidden = true;
+}
+
+function openEssencePopup(ally, slotIndex) {
+  const eid = ally.essences[slotIndex];
+  const e = ESSENCES[eid];
+  const pop = document.getElementById("popup");
+  const cards = e.cards.map(function (x) {
+    return "<li>" + CARDS[x.id].name + " ×" + x.count + "<small>" + cardDetail(x.id) + "</small></li>";
+  }).join("");
+  pop.innerHTML =
+    '<div class="popup">' +
+    '<button class="pclose" aria-label="닫기">✕</button>' +
+    "<h3>" + e.name + "</h3>" +
+    '<div class="ptrait">장착: ' + ally.name + " · 특성: " + e.text + "</div>" +
+    '<ul class="pcards">' + cards + "</ul>" +
+    '<button class="punequip">장착 해제</button>' +
+    "</div>";
+  pop.hidden = false;
+  pop.onclick = function (ev) { if (ev.target === pop) closePopup(); }; // 바깥을 눌러도 닫힘
+  pop.querySelector(".pclose").onclick = closePopup;
+  pop.querySelector(".punequip").onclick = function () {
+    ally.essences.splice(slotIndex, 1);
+    campNotice = e.name + " 해제 (보관함으로)";
+    campSelected = null;
+    closePopup();
+    renderCamp();
+  };
 }
