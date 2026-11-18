@@ -14,10 +14,48 @@ function rangeText(list) {
   return list.length === 1 ? list[0] : list[0] + "~" + list[list.length - 1];
 }
 
-function cardText(card) {
+function cardText(card, bonus) {
   let t = (card.type === "attack" ? "피해 " : "방어도 ") + card.value;
+  if (bonus) t += "(+" + bonus + ")";
   if (card.push) t += ", 뒤로 " + card.push + "칸";
+  if (card.selfPush) t += ", 자신 뒤로 " + card.selfPush + "칸";
   return t;
+}
+
+// ---- 정수 특성 ----
+function traitsOf(ally) {
+  return ally.essences.map(function (id) { return ESSENCES[id].trait; });
+}
+
+function maxHpOf(ally) {
+  let hp = ally.baseMaxHp;
+  traitsOf(ally).forEach(function (t) { if (t.type === "maxHp") hp += t.value; });
+  return hp;
+}
+
+// 소유 캐릭터가 지금 칸에서 쓰는 공격 카드의 추가 피해
+function cardDamageBonus(c) {
+  const card = CARDS[c.id];
+  if (card.type !== "attack") return 0;
+  const owner = allyOf(c.owner);
+  let bonus = 0;
+  traitsOf(owner).forEach(function (t) {
+    if (t.type === "damageBonus" && t.pos.indexOf(owner.pos) >= 0) bonus += t.value;
+  });
+  return bonus;
+}
+
+// 장착한 정수들이 주는 덱 카드 목록
+function buildDeckCards() {
+  const list = [];
+  ALLIES.forEach(function (a) {
+    a.essences.forEach(function (eid) {
+      ESSENCES[eid].cards.forEach(function (e) {
+        for (let i = 0; i < e.count; i++) list.push({ id: e.id, owner: a.name });
+      });
+    });
+  });
+  return list;
 }
 
 function allyOf(name) {
@@ -66,15 +104,31 @@ function drawCards() {
 function startTurn() {
   battle.turn++;
   ALLIES.forEach(function (a) { a.block = 0; }); // 방어도는 아군 턴 시작 때 사라짐
+  ALLIES.forEach(function (a) { // 정수 특성: 턴 시작 때 방어도
+    if (a.hp <= 0) return;
+    traitsOf(a).forEach(function (t) {
+      if (t.type === "turnStartBlock" && t.pos.indexOf(a.pos) >= 0) a.block += t.value;
+    });
+  });
   battle.energy = RULES.energyMax;
   battle.moves = 0;
   drawCards();
 }
 
-function initBattle() {
-  START_DECK.forEach(function (e) {
-    for (let i = 0; i < e.count; i++) battle.deck.push({ id: e.id, owner: e.owner });
+// 전투를 처음 상태로 준비한다 (정비 화면의 [전투 시작])
+function resetBattle() {
+  battle.deck = buildDeckCards();
+  battle.hand = [];
+  battle.discard = [];
+  battle.turn = 0;
+  ALLIES.forEach(function (a) {
+    a.pos = a.startPos;
+    a.maxHp = maxHpOf(a);
+    a.hp = a.maxHp;
+    a.block = 0;
   });
+  ENEMIES.length = 0;
+  ENEMY_SETUP.forEach(function (s) { ENEMIES.push(spawnEnemy(s[0], s[1])); });
   shuffle(battle.deck);
   startTurn();
 }
@@ -175,10 +229,12 @@ function playCard(handIndex, target) {
   const c = battle.hand[handIndex];
   const card = CARDS[c.id];
   if (!canPlay(c) || validTargets(c).indexOf(target) < 0) return false;
+  const bonus = cardDamageBonus(c); // 이동하기 전 칸 기준
   battle.energy -= card.cost;
-  if (card.type === "attack") applyDamage(target, card.value);
+  if (card.type === "attack") applyDamage(target, card.value + bonus);
   else if (card.type === "block") target.block += card.value;
   if (card.push) pushBack(target, ENEMIES, card.push);
+  if (card.selfPush) pushBack(allyOf(c.owner), ALLIES, card.selfPush);
   battle.hand.splice(handIndex, 1);
   battle.discard.push(c);
   return true;

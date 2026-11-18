@@ -92,7 +92,7 @@ function renderHand() {
       '<div class="cost">' + card.cost + "</div>" +
       '<div class="cowner">' + c.owner + " " + rangeText(card.usePos) + "칸</div>" +
       '<div class="cname">' + card.name + "</div>" +
-      '<div class="ctext">' + cardText(card) + "</div>";
+      '<div class="ctext">' + cardText(card, cardDamageBonus(c)) + "</div>";
     el.onclick = function () {
       if (busy) return;
       if (reason) { // 못 쓰는 카드는 이유만 보여준다
@@ -134,7 +134,7 @@ function render() {
     const c = battle.hand[selected];
     const card = CARDS[c.id];
     const who = card.target === "self" ? "빛나는 " + c.owner + " 칸을 누르세요" : "대상 적을 누르세요";
-    msg.textContent = card.name + " (" + cardText(card) + ") - " + who;
+    msg.textContent = card.name + " (" + cardText(card, cardDamageBonus(c)) + ") - " + who;
   } else if (moveMode) {
     msg.textContent = moveFrom === null
       ? "자리를 바꿀 아군을 누르세요"
@@ -181,5 +181,21 @@ document.getElementById("move").onclick = function () {
   render();
 };
 
-initBattle();
-render();
+// 정비 화면 <-> 전투 화면
+function startBattle() {
+  cancelAll();
+  logLines.length = 0;
+  busy = false;
+  resetBattle();
+  document.getElementById("camp").hidden = true;
+  document.getElementById("game").hidden = false;
+  render();
+}
+
+document.getElementById("to-camp").onclick = function () {
+  if (busy) return;
+  document.getElementById("game").hidden = true;
+  showCamp();
+};
+
+showCamp();
