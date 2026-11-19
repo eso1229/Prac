@@ -25,7 +25,7 @@ function slotAction(unit, kind) {
     }
     return null;
   }
-  if (moveMode && kind === "ally") {
+  if (moveMode && kind === "ally" && unit.hp > 0) {
     if (moveFrom === null) {
       return function () { moveFrom = unit; };
     }
@@ -58,10 +58,14 @@ function makeSlot(unit, pos, kind) {
     '<div class="stat">체력 ' + unit.hp + "/" + unit.maxHp + "</div>" +
     '<div class="stat block">방어 ' + unit.block + "</div>";
   if (unit === moveFrom) slot.classList.add("move-from");
+  if (unit.hp <= 0) {
+    slot.classList.add("dead");
+    slot.querySelector(".block").textContent = "쓰러짐";
+  }
   const action = slotAction(unit, kind);
   if (action) {
     slot.classList.add("targetable");
-    slot.onclick = function () { action(); render(); };
+    slot.onclick = function () { action(); render(); checkEnd(); };
   }
   return slot;
 }
@@ -144,6 +148,17 @@ function render() {
   }
 }
 
+// 전투가 끝났는지 확인하고 결과 화면을 띄운다
+function checkEnd() {
+  const r = checkBattleEnd();
+  if (!r) return false;
+  busy = true;
+  cancelAll();
+  render();
+  showResult(r);
+  return true;
+}
+
 // 적 턴: 1번 칸 적부터 한 명씩 행동하고, 끝나면 아군 턴을 시작한다
 function runEnemyTurn() {
   busy = true;
@@ -161,6 +176,7 @@ function runEnemyTurn() {
     const e = queue.shift();
     if (e.hp > 0) logLines.push(enemyAct(e));
     render();
+    if (checkEnd()) return; // 아군 전멸이면 적 턴을 멈춘다
     setTimeout(next, RULES.enemyActionDelay);
   }
   setTimeout(next, RULES.enemyActionDelay);
@@ -191,11 +207,5 @@ function startBattle() {
   document.getElementById("game").hidden = false;
   render();
 }
-
-document.getElementById("to-camp").onclick = function () {
-  if (busy) return;
-  document.getElementById("game").hidden = true;
-  showCamp();
-};
 
 showCamp();

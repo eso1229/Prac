@@ -71,6 +71,7 @@ function hitTargets(card) {
 function cannotPlayReason(c) {
   const card = CARDS[c.id];
   const owner = allyOf(c.owner);
+  if (owner.hp <= 0) return "쓰러진 캐릭터(" + owner.name + ")의 카드는 쓸 수 없어요";
   if (battle.energy < card.cost) return "에너지가 부족해요";
   if (card.usePos.indexOf(owner.pos) < 0)
     return owner.name + "의 카드는 " + rangeText(card.usePos) + "칸에서만 쓸 수 있어요 (지금 " + owner.pos + "칸)";
@@ -86,7 +87,7 @@ function canPlay(c) {
 function validTargets(c) {
   const card = CARDS[c.id];
   if (card.target === "self") return [allyOf(c.owner)];
-  if (card.target === "ally") return ALLIES;
+  if (card.target === "ally") return livingAllies();
   return hitTargets(card);
 }
 
@@ -233,7 +234,8 @@ function playCard(handIndex, target) {
   battle.energy -= card.cost;
   if (card.type === "attack") applyDamage(target, card.value + bonus);
   else if (card.type === "block") target.block += card.value;
-  if (card.push) pushBack(target, ENEMIES, card.push);
+  removeDeadEnemies(); // 쓰러진 적은 사라지고 뒤의 적이 앞으로 당겨진다
+  if (card.push && target.hp > 0) pushBack(target, ENEMIES, card.push);
   if (card.selfPush) pushBack(allyOf(c.owner), ALLIES, card.selfPush);
   battle.hand.splice(handIndex, 1);
   battle.discard.push(c);
@@ -246,9 +248,32 @@ function canMove() {
 }
 
 function swapAllies(a, b) {
+  if (a.hp <= 0 || b.hp <= 0) return false; // 쓰러진 아군과는 자리를 바꿀 수 없다
   if (!canMove() || Math.abs(a.pos - b.pos) !== 1) return false;
   swapPos(a, b);
   battle.energy -= RULES.moveCost;
   battle.moves++;
   return true;
+}
+
+// ---- 쓰러짐과 승패 ----
+// 쓰러진 적을 없애고, 남은 적을 앞칸부터 채운다
+function removeDeadEnemies() {
+  for (let i = ENEMIES.length - 1; i >= 0; i--) {
+    if (ENEMIES[i].hp <= 0) ENEMIES.splice(i, 1);
+  }
+  ENEMIES.sort(function (a, b) { return a.pos - b.pos; });
+  ENEMIES.forEach(function (e, i) { e.pos = i + 1; });
+}
+
+// 전투가 끝났는지: "win"(적 전멸) / "lose"(아군 전멸) / null(계속)
+function checkBattleEnd() {
+  if (ENEMIES.length === 0) return "win";
+  if (livingAllies().length === 0) return "lose";
+  return null;
+}
+
+// 전투가 끝나면 아군 체력을 모두 회복한다
+function healAllies() {
+  ALLIES.forEach(function (a) { a.hp = maxHpOf(a); a.block = 0; });
 }

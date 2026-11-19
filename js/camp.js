@@ -2,9 +2,12 @@
 let campSelected = null; // 보관함에서 고른 정수 번호
 let campNotice = "";
 
+// 가진 정수 (보상으로 늘어난다)
+const ownedEssences = START_STOCK.slice();
+
 // 보관함에 남은 정수 목록 (가진 정수 - 장착 중인 정수)
 function freeEssences() {
-  const free = START_STOCK.slice();
+  const free = ownedEssences.slice();
   ALLIES.forEach(function (a) {
     a.essences.forEach(function (id) {
       const i = free.indexOf(id);
