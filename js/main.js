@@ -58,14 +58,10 @@ function makeSlot(unit, pos, kind) {
     '<div class="stat">체력 ' + unit.hp + "/" + unit.maxHp + "</div>" +
     '<div class="stat block">방어 ' + unit.block + "</div>";
   if (unit === moveFrom) slot.classList.add("move-from");
-  if (unit.hp <= 0) {
-    slot.classList.add("dead");
-    slot.querySelector(".block").textContent = "쓰러짐";
-  }
   const action = slotAction(unit, kind);
   if (action) {
     slot.classList.add("targetable");
-    slot.onclick = function () { action(); render(); checkEnd(); };
+    slot.onclick = function () { action(); afterAction(); };
   }
   return slot;
 }
@@ -148,15 +144,18 @@ function render() {
   }
 }
 
-// 전투가 끝났는지 확인하고 결과 화면을 띄운다
-function checkEnd() {
+// 행동 뒤에: 쓰러진 유닛을 정리하고 화면을 새로 그린 뒤, 전투가 끝났으면 결과 화면을 띄운다
+function afterAction() {
+  removeDeadEnemies();
+  removeDeadAllies();
   const r = checkBattleEnd();
-  if (!r) return false;
-  busy = true;
-  cancelAll();
+  if (r) {
+    busy = true;
+    cancelAll();
+  }
   render();
-  showResult(r);
-  return true;
+  if (r) showResult(r);
+  return !!r;
 }
 
 // 적 턴: 1번 칸 적부터 한 명씩 행동하고, 끝나면 아군 턴을 시작한다
@@ -175,8 +174,7 @@ function runEnemyTurn() {
     }
     const e = queue.shift();
     if (e.hp > 0) logLines.push(enemyAct(e));
-    render();
-    if (checkEnd()) return; // 아군 전멸이면 적 턴을 멈춘다
+    if (afterAction()) return; // 아군 전멸이면 적 턴을 멈춘다
     setTimeout(next, RULES.enemyActionDelay);
   }
   setTimeout(next, RULES.enemyActionDelay);

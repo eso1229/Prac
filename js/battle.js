@@ -195,7 +195,7 @@ function enemyAct(e) {
     const t = pickTarget();
     if (!t) return e.name + ": " + a.name + " (대상 없음)";
     applyDamage(t, a.value);
-    return e.name + " → " + t.name + " " + a.name + " (피해 " + a.value + ")";
+    return e.name + " → " + t.name + " " + a.name + " (피해 " + a.value + ")" + (t.hp <= 0 ? " - " + t.name + " 쓰러짐" : "");
   }
   if (a.type === "block") {
     e.block += a.value;
@@ -264,6 +264,21 @@ function removeDeadEnemies() {
   }
   ENEMIES.sort(function (a, b) { return a.pos - b.pos; });
   ENEMIES.forEach(function (e, i) { e.pos = i + 1; });
+}
+
+// 쓰러진 아군은 전장에서 빠지고(칸 0), 그 아군의 카드는 덱·손패·버린 더미에서 사라진다.
+// 남은 아군은 앞칸부터 당겨진다.
+function removeDeadAllies() {
+  ALLIES.forEach(function (a) {
+    if (a.hp <= 0 && a.pos > 0) {
+      a.pos = 0;
+      ["deck", "hand", "discard"].forEach(function (k) {
+        battle[k] = battle[k].filter(function (c) { return c.owner !== a.name; });
+      });
+    }
+  });
+  livingAllies().sort(function (a, b) { return a.pos - b.pos; })
+    .forEach(function (a, i) { a.pos = i + 1; });
 }
 
 // 전투가 끝났는지: "win"(적 전멸) / "lose"(아군 전멸) / null(계속)
