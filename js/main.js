@@ -122,7 +122,7 @@ function render() {
   moveBtn.textContent = "이동 (" + RULES.moveCost + ")";
   moveBtn.disabled = busy || !canMove();
   document.getElementById("end-turn").disabled = busy;
-  document.getElementById("log").innerHTML = logLines.slice(-3).join("<br>");
+  document.getElementById("log").innerHTML = logLines.slice(-2).join("<br>");
   moveBtn.classList.toggle("active", moveMode);
 
   const msg = document.getElementById("msg");
