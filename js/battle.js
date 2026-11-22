@@ -49,6 +49,7 @@ function cardDamageBonus(c) {
 function buildDeckCards() {
   const list = [];
   ALLIES.forEach(function (a) {
+    if (a.hp <= 0) return; // 쓰러진 아군(영구 사망)의 카드는 없다
     a.essences.forEach(function (eid) {
       ESSENCES[eid].cards.forEach(function (e) {
         for (let i = 0; i < e.count; i++) list.push({ id: e.id, owner: a.name });
@@ -116,20 +117,22 @@ function startTurn() {
   drawCards();
 }
 
-// 전투를 처음 상태로 준비한다 (정비 화면의 [전투 시작])
-function resetBattle() {
+// 전투를 준비한다 (setup: 적 조합 [[종류, 칸], ...], hpMult: 적 체력 배율)
+// 아군 체력은 전투 사이에 회복되지 않으므로 그대로 이어받고, 쓰러진 아군(체력 0)은 나오지 않는다.
+function resetBattle(setup, hpMult) {
   battle.deck = buildDeckCards();
   battle.hand = [];
   battle.discard = [];
   battle.turn = 0;
+  livingAllies().sort(function (a, b) { return a.startPos - b.startPos; })
+    .forEach(function (a, i) { a.pos = i + 1; });
   ALLIES.forEach(function (a) {
-    a.pos = a.startPos;
+    if (a.hp <= 0) a.pos = 0;
     a.maxHp = maxHpOf(a);
-    a.hp = a.maxHp;
     a.block = 0;
   });
   ENEMIES.length = 0;
-  ENEMY_SETUP.forEach(function (s) { ENEMIES.push(spawnEnemy(s[0], s[1])); });
+  setup.forEach(function (s) { ENEMIES.push(spawnEnemy(s[0], s[1], hpMult)); });
   shuffle(battle.deck);
   startTurn();
 }
@@ -149,6 +152,7 @@ function intentText(e) {
   const a = currentIntent(e);
   if (a.type === "attack") return "⚔ " + a.name + " " + a.value;
   if (a.type === "block") return "🛡 " + a.name + " " + a.value;
+  if (a.type === "aoe") return "💥 " + a.name + " " + a.value + " (전체)";
   return "🌀 " + a.name;
 }
 
@@ -200,6 +204,12 @@ function enemyAct(e) {
   if (a.type === "block") {
     e.block += a.value;
     return e.name + ": " + a.name + " (방어도 " + a.value + ")";
+  }
+  if (a.type === "aoe") { // 범위 공격: 피격 편향 없이 아군 전체에게
+    const hit = livingAllies();
+    hit.forEach(function (t) { applyDamage(t, a.value); });
+    const fallen = hit.filter(function (t) { return t.hp <= 0; }).map(function (t) { return t.name; });
+    return e.name + ": " + a.name + " (전체 피해 " + a.value + ")" + (fallen.length ? " - " + fallen.join(", ") + " 쓰러짐" : "");
   }
   if (a.type === "curse") {
     const list = shuffle(livingAllies().slice());
@@ -288,7 +298,4 @@ function checkBattleEnd() {
   return null;
 }
 
-// 전투가 끝나면 아군 체력을 모두 회복한다
-function healAllies() {
-  ALLIES.forEach(function (a) { a.hp = maxHpOf(a); a.block = 0; });
-}
+

@@ -2,6 +2,7 @@
 const RULES = {
   handSize: 5,   // 턴 시작 시 손패 장수
   energyMax: 3,  // 턴 시작 시 에너지
+  restHealPercent: 30, // 휴식 칸에서 회복하는 체력 (최대 체력의 %)
   rewardChoices: 3, // 승리 보상 정수 후보 수
   essenceSlots: 2, // 캐릭터당 정수 장착 칸
   moveCost: 1,   // 직접 이동(인접 아군과 자리 교환) 에너지
