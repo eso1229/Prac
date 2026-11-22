@@ -93,6 +93,5 @@ h1 { font-size: 16px; text-align: center; margin: 0; color: #b89b6a; }
 .popup .pcards small { display: block; color: #a89a80; }
 .popup .pclose { position: absolute; top: 6px; right: 8px; width: 28px; height: 28px; border: none; background: none; color: #e8dcc8; font-size: 20px; }
 .popup .punequip { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #a63a32; background: #3a2a28; color: #e8dcc8; font-size: 14px; }
-.slot.dead { opacity: 0.4; }
 .rchoice { display: block; width: 100%; text-align: left; margin-bottom: 6px; padding: 8px; border-radius: 6px; border: 1px solid #6b5a42; background: #2a211b; color: #e8dcc8; font-size: 13px; }
 .rchoice small { display: block; color: #a89a80; font-size: 11px; margin-top: 2px; }
