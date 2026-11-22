@@ -154,7 +154,7 @@ function afterAction() {
     cancelAll();
   }
   render();
-  if (r) showResult(r);
+  if (r) onBattleEnd(r);
   return !!r;
 }
 
@@ -195,15 +195,23 @@ document.getElementById("move").onclick = function () {
   render();
 };
 
-// 정비 화면 <-> 전투 화면
-function startBattle() {
+// 화면 전환: 한 번에 한 화면만 보인다 (겹쳐 뜨는 팝업/결과 창은 닫는다)
+function showScreen(name) {
+  ["title", "map", "camp", "game"].forEach(function (id) {
+    document.getElementById(id).hidden = id !== name;
+  });
+  document.getElementById("popup").hidden = true;
+  document.getElementById("result").hidden = true;
+}
+
+// 전투 시작 (지도에서 칸을 골랐을 때)
+function startBattle(setup, hpMult) {
   cancelAll();
   logLines.length = 0;
   busy = false;
-  resetBattle();
-  document.getElementById("camp").hidden = true;
-  document.getElementById("game").hidden = false;
+  resetBattle(setup, hpMult);
+  showScreen("game");
   render();
 }
 
-showCamp();
+showTitle();

@@ -1,4 +1,4 @@
-// 카드 데이터. 카드를 추가하려면 CARDS에 한 줄 넣고 START_DECK에 장수를 적는다.
+// 카드 데이터. 카드를 추가하려면 CARDS에 한 줄 넣는다. 카드는 정수가 준다 (data/essences.js).
 // type: "attack"(피해) / "block"(방어도)
 // target: "enemy"(적 한 명) / "self"(소유 캐릭터 자신) / "ally"(아군 한 명)
 // usePos: 소유 캐릭터가 서 있어야 하는 칸   hitPos: 타격 가능한 적의 칸

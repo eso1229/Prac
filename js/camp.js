@@ -2,9 +2,6 @@
 let campSelected = null; // 보관함에서 고른 정수 번호
 let campNotice = "";
 
-// 가진 정수 (보상으로 늘어난다)
-const ownedEssences = START_STOCK.slice();
-
 // 보관함에 남은 정수 목록 (가진 정수 - 장착 중인 정수)
 function freeEssences() {
   const free = ownedEssences.slice();
@@ -26,7 +23,7 @@ function cardsText(eid) {
 function showCamp() {
   campSelected = null;
   campNotice = "";
-  document.getElementById("camp").hidden = false;
+  showScreen("camp");
   renderCamp();
 }
 
@@ -44,7 +41,12 @@ function renderCamp() {
 
   ALLIES.forEach(function (a) {
     const box = add("div", "cchar", "");
-    box.innerHTML = '<div class="cchar-name">' + a.name + " <small>최대 체력 " + maxHpOf(a) + "</small></div>";
+    if (a.hp <= 0) { // 쓰러진 아군은 이번 런에서 돌아오지 않는다
+      box.classList.add("dead");
+      box.innerHTML = '<div class="cchar-name">' + a.name + " <small>사망 (이번 런에서 사용 불가)</small></div>";
+      return;
+    }
+    box.innerHTML = '<div class="cchar-name">' + a.name + " <small>체력 " + a.hp + "/" + a.maxHp + "</small></div>";
     const slots = document.createElement("div");
     slots.className = "cslots";
     for (let i = 0; i < RULES.essenceSlots; i++) {
@@ -61,6 +63,8 @@ function renderCamp() {
         } else if (campSelected !== null) {
           const id = freeEssences()[campSelected];
           a.essences.push(id);
+          refreshMaxHp(a);
+          saveRun();
           campNotice = a.name + "에게 " + ESSENCES[id].name + " 장착";
         } else {
           campNotice = "아래 보관함에서 정수를 먼저 고르세요";
@@ -92,9 +96,8 @@ function renderCamp() {
   }).join(" · ");
   add("div", "cdeck", "덱 " + deck.length + "장 (" + counts + ")");
   add("div", "cnotice", campNotice || "장착한 정수를 누르면 상세 내용을 볼 수 있어요");
-  const start = add("button", "end-turn cstart", deck.length === 0 ? "정수를 장착하세요" : "전투 시작");
-  start.disabled = deck.length === 0;
-  start.onclick = startBattle;
+  const back = add("button", "end-turn cstart", "맵으로");
+  back.onclick = showMap;
 }
 
 // 카드 한 줄 설명 (비용, 사용 칸, 효과)
@@ -130,6 +133,8 @@ function openEssencePopup(ally, slotIndex) {
   pop.querySelector(".pclose").onclick = closePopup;
   pop.querySelector(".punequip").onclick = function () {
     ally.essences.splice(slotIndex, 1);
+    refreshMaxHp(ally);
+    saveRun();
     campNotice = e.name + " 해제 (보관함으로)";
     campSelected = null;
     closePopup();
