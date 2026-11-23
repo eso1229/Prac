@@ -6,6 +6,7 @@
 ## 새 세션 시작
 - 순서대로 읽는다: `CLAUDE.md` → `HANDOFF.md`(현재 상태, 작업 절차, 응답 양식) → `PLAN.md`의 현재 단계.
 - 응답은 `HANDOFF.md` 4장의 양식을 따른다. 콘텐츠 작업은 `content/README.md`를 먼저 읽는다.
+- 작업 절차는 프로젝트 스킬 `phase-workflow`, 콘텐츠 상의는 `content-design`(`.claude/skills/`)을 따른다.
 
 ## 문서 위치
 - 게임 규칙, 수치, 예시 데이터: `GAME_DESIGN.md` (규칙의 기준)

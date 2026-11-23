@@ -27,6 +27,8 @@
 | `js/battle.js` | 전투 규칙 (화면을 직접 만지지 않음) |
 | `js/run.js` | 런 진행(지도 생성, 이동, 휴식 회복, 저장/불러오기) (화면을 직접 만지지 않음) |
 | `js/camp.js`, `js/result.js`, `js/mapview.js`, `js/main.js` | 화면 (정비, 결과·보상, 시작/지도, 전투·화면 전환) |
+| `.claude/skills/` | 프로젝트 전용 스킬: `phase-workflow`(단계 진행 절차), `content-design`(콘텐츠 설계 상의). 2-1단계에서 `playtest-check`를 추가 |
+| `content/` | 콘텐츠 설계 문서(2-0단계). 인덱스 `content/README.md`부터 읽는다 |
 
 - **설계 원칙**: 데이터(`data/`) / 규칙(`battle.js`, `run.js`) / 화면을 분리한다. 나중에 고도(Godot)로 이식하기 위해서다. 카드·정수·적·수치는 코드에 직접 쓰지 않는다.
 - 스크립트는 `<script>` 태그 순서대로 불러온다(모듈 방식 아님). 새 파일은 `index.html`에 순서에 맞게 추가한다.
@@ -42,13 +44,12 @@
 - 사용자가 폰에서 PR을 합치는 법을 모를 수 있다: PR 링크 → 맨 아래 **Merge pull request** → **Confirm merge**.
 
 ## 5. 작업 절차 (한 단계마다)
-1. `git fetch` 후 이전 PR이 합쳐졌는지 확인: `git merge-base --is-ancestor origin/<개발 브랜치> origin/main`. 합쳐졌으면 `git reset --hard origin/main`으로 새로 시작한다. **합쳐지지 않았으면 그 위에 쌓지 말고** 사용자에게 먼저 합쳐 달라고 부탁한다.
-2. 질문 → 구현 → 테스트 → 문서 갱신 → 커밋 → 푸시 → PR 생성.
-3. **브랜치**: 세션이 정해 준 개발 브랜치에서만 작업·푸시한다. force push는 막혀 있다(reset 후 일반 push는 가능).
-4. **PR 생성**: `gh` CLI는 없다. GitHub MCP 도구(`mcp__github__create_pull_request`)를 쓴다(도구 스키마는 ToolSearch로 불러온다). 사용자가 요청하지 않은 PR/코멘트는 만들지 않는다.
-5. **테스트**: 브라우저(Playwright)가 미리 설치돼 있다. 폰 크기(360×600, 360×640)로 열고 ① 스크롤 없이 한 화면에 들어가는지(`scrollHeight <= innerHeight`) ② `pageerror` 없음 ③ 시나리오(`page.evaluate`로 상태를 만들어 규칙 확인)를 점검한다. 스크립트는 scratchpad에 쓴다(세션이 끝나면 사라진다).
-6. PR이 합쳐진 뒤 GitHub Pages 반영은 1~2분 걸린다.
-7. 합친 뒤에 같은 브랜치에 올린 커밋은 main에 들어가지 않는다 → 새 PR이 필요하다.
+- **자세한 절차는 프로젝트 스킬을 따른다**: `.claude/skills/phase-workflow/SKILL.md`(단계 진행·질문 양식·테스트·PR·보고), `.claude/skills/content-design/SKILL.md`(2-0단계 콘텐츠 설계 상의). 스킬이 자동으로 불러와지지 않으면 직접 열어 읽는다.
+- 꼭 기억할 것(스킬이 없어도 지킨다):
+  1. 시작 전에 이전 PR이 합쳐졌는지 확인한다(`git merge-base --is-ancestor origin/<브랜치> origin/main`). 합쳐졌으면 `git reset --hard origin/main`. 합쳐지지 않았으면 코드는 그 위에 쌓지 말고 사용자에게 합쳐 달라고 부탁한다.
+  2. 질문 먼저 → 구현 → 폰 크기(360×600)로 테스트 → 문서 갱신 → 커밋·푸시 → PR(GitHub MCP 도구, `gh` 없음).
+  3. 세션이 정해 준 개발 브랜치에서만 작업한다. force push는 막혀 있다.
+  4. 합친 뒤에 같은 브랜치에 올린 커밋은 main에 들어가지 않는다 → 새 PR이 필요하다.
 
 ## 6. 알려진 임시/미완 사항 (2차 이후에 정한다)
 - 아군 4명 이름·능력치는 임시(가렌, 리아, 토비, 세라). **시작 4명은 임시**이고 2차 2-2단계에서 시작 2명 + 영입으로 바꾼다.
